@@ -38,8 +38,10 @@ def calcular_aluguel(imovel, quartos, vagas, crianca):
             valor += vagas * dados['garagem']
         else:
             if imovel == 'Studio':
+                if vagas < 2:
+                    raise ValueError("Studio requer mínimo de 2 vagas no pacote.")
                 valor += dados['garagem_2vagas']
-                if imovel == 'Studio' and vagas > 2:
+                if vagas > 2:
                     valor += (vagas - 2) * dados['garagem_extra']
     if imovel == 'Apartamento' and not crianca:
         valor *= (1 - dados['sem_crianca'])
@@ -51,7 +53,7 @@ def gerar_csv(nome_cliente, imovel, aluguel_mensal, parcela_contrato, parcelas):
 
     with open(nome_arquivo, 'w', newline='', encoding='utf-8-sig') as file:
         writer = csv.writer(file, delimiter=';')
-        writer.writerow(['Aluguel R$', 'Parcela Contrato R$', 'Total R$'])
+        writer.writerow(['Parcela', 'Vencimento', 'Aluguel R$', 'Parcela Contrato R$', 'Total R$'])
 
         for i in range(1,13):
             vencimento = hoje + relativedelta(months=i)
@@ -66,7 +68,15 @@ def gerar_csv(nome_cliente, imovel, aluguel_mensal, parcela_contrato, parcelas):
              ])
 
     return nome_arquivo
-
+    
+def input_nome(mensagem):
+    while True:
+        nome = input(mensagem).strip()
+        if nome:
+            return nome
+        else:
+            print('Nome não pode ser vazio. Por favor, digite o nome do cliente.')
+            
 def input_int(mensagem, minimo = 0):
     while True:
         try:
@@ -97,7 +107,7 @@ while True:
     print('   🏠  IMOBILIÁRIA R.M  —  Gerador de Orçamento')
     print('=' * 55)    
 
-    nome_cliente = input('Nome do cliente: ').strip()
+    nome_cliente = input_nome('Nome do cliente: ').strip()
 
     imovel = input_imovel()
 
